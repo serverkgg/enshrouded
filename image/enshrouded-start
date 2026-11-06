@@ -1,0 +1,34 @@
+#!/bin/bash
+set -euo pipefail
+
+cd "$1"
+shift
+
+SESSION_NOISE=(
+  -e '/^\[[A-Z] [0-9:,]+\] -+ Session -+$/d'
+  -e '/^\[[A-Z] [0-9:,]+\] Machines:$/d'
+  -e '/^\[[A-Z] [0-9:,]+\] +m#[0-9]+\([0-9]+\): /d'
+  -e '/^\[[A-Z] [0-9:,]+\] -+$/d'
+)
+
+mkdir -p logs
+if [ -s logs/enshrouded_server.log ]; then
+	mv -f logs/enshrouded_server.log logs/enshrouded_server-previous.log
+fi
+: > logs/enshrouded_server.log
+tail -n 0 -F logs/enshrouded_server.log 2>/dev/null | sed -u -E "${SESSION_NOISE[@]}" &
+
+mkdir -p /tmp/serverk-xdg
+chmod 0700 /tmp/serverk-xdg
+
+WINE_NOISE=(
+  -e 's#flock /sys/devices/virtual/dmi/id/[a-z_]+ LOCK_SH failed\. errno = [0-9]+##g'
+  -e '/^ProtonFixes\[[0-9]+\] WARN: Skipping fix execution/d'
+  -e '/^fsync: up and running\.$/d'
+  -e '/^Wine cannot find the FreeType font library/d'
+  -e '/^use TrueType fonts please install a version of FreeType/d'
+  -e '/^or equal to 2\.0\.5\.$/d'
+  -e '/^http:\/\/www\.freetype\.org$/d'
+)
+
+exec xvfb-run -a "$@" > /dev/null 2> >(sed -u -E "${WINE_NOISE[@]}" >&2)

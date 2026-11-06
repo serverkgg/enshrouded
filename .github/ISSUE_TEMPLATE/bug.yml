@@ -1,0 +1,32 @@
+name: مشكلة / Bug report
+description: خلل في سيرفر إنشراودد أو في الحزمة نفسها / Something broken in the Enshrouded server or the package itself
+labels:
+  - bug
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: ماذا حدث؟ / What happened?
+      description: اشرح المشكلة، وأرفق السجل أو صورة إن أمكن / Describe the problem, attach logs or screenshots if you can
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: ما الذي كنت تتوقعه؟ / What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: خطوات التكرار / Steps to reproduce
+      description: كيف نصل إلى المشكلة نفسها؟ / How do we hit the same problem?
+    validations:
+      required: false
+  - type: input
+    id: game-version
+    attributes:
+      label: إصدار اللعبة / Game version
+      placeholder: "1.0.x"
+    validations:
+      required: false

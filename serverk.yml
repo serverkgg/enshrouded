@@ -1,0 +1,260 @@
+# yaml-language-server: $schema=./serverk.schema.json
+schemaVersion: serverk.gg/v1
+kind: GamePackage
+
+metadata:
+  id: enshrouded
+  name:
+    ar: إنشراودد
+    en: Enshrouded
+  description:
+    ar: سيرفر إنشراودد لماب مفتوح يغطيه ضباب قاتل، تستكشفه وتقاتل فيه وتبني قاعدتك مع أصحابك. حتى 16 لاعبًا في الماب نفسه، وتضبط من اللوحة الصعوبة وكلمات مرور الرتب والشات الصوتي، مع نسخ احتياطية تلقائية لمابك.
+    en: Enshrouded dedicated servers for an open world under a deadly fog, to explore, fight and build your base with your friends. Up to 16 players in one world, and the panel sets the difficulty, the role passwords and voice chat, with automatic backups of your world.
+  tagline:
+    ar: ابنِ قاعدتك وواجه الضباب مع أصحابك، على سيرفر جاهز خلال دقائق
+    en: Build your base and face the fog with your friends, on a server ready in minutes
+  category: survival
+  logo: assets/logo.webp
+  banner: assets/banner.webp
+
+steam:
+  appId: 2278520
+
+resources:
+  minMemoryMb: 4096
+  recommendedMemoryMb: 8192
+  minDiskMb: 20480
+  maxRecommendedPlayers: 16
+
+container:
+  image: serverkgg/enshrouded
+  runtime:
+    platform: wine
+    installBudgetMinutes: 5
+    bootBudgetMinutes: 2
+    shmMb: 256
+    pidsLimit: 512
+  ports:
+    - key: query
+      containerPort: 15637
+      protocol: udp
+      mirror: true
+      join: combined
+      name:
+        ar: إنشراودد
+        en: Enshrouded
+      hint:
+        ar: في إنشراودد افتح Join وفعّل Show dedicated servers وابحث عن اسم سيرفرك، أو أضف العنوان إلى مفضلة Steam كما يظهر.
+        en: In Enshrouded open Join, turn on Show dedicated servers and find your server by name, or add the address to your Steam favorites as shown.
+      hostRange:
+        default: 9400
+        min: 9400
+        max: 9499
+
+backup:
+  only:
+    - savegame/**
+    - enshrouded_server.json
+    - .serverk-install.json
+  except:
+    - savegame/backup/**
+    - savegame/migrated/**
+
+secrets:
+  - key: STEAM_WEB_API_KEY
+    description:
+      ar: مفتاح Steam Web API الخاص بالمنصة، ونجلب به صور حسابات Steam التي تظهر في جدول اللاعبين.
+      en: The platform's Steam Web API key. It reads the Steam avatars shown in the players list.
+    required: false
+
+reset:
+  keep:
+    - .steamcmd
+    - .steam
+    - .proton
+    - .serverk-wine.json
+    - .cache
+    - steamapps
+    - Steam
+    - _CommonRedist
+    - enshrouded_server.exe
+    - enshrouded_server_*.dat
+    - enshrouded_server.kfc
+    - enshrouded_server.kfc_resources
+    - enshrouded_server_readme.txt
+    - steam_appid.txt
+    - "*.dll"
+
+presence:
+  name: player
+  id: steamId
+  avatar: "https://avatars.steamstatic.com/{avatarHash}_full.jpg"
+  fields:
+    - key: steamId
+      label:
+        ar: رقم Steam
+        en: Steam ID
+
+files:
+  protected:
+    - .serverk-install.json
+    - .serverk-wine.json
+    - .serverk-staging/**
+  notable:
+    - match: enshrouded_server.json
+      label:
+        ar: إعدادات السيرفر
+        en: Server settings
+      icon: settings
+      color: "#de9b35"
+      restart: true
+      note:
+        ar: اسم سيرفرك وعدد اللاعبين والصعوبة والشات وكلمات مرور الرتب. عدّلها من تبويبي الإعدادات والصعوبة، ونكتبها لك في الملف، وفي التشغيل القادم إذا كان السيرفر شغّالًا. يكتب إنشراودد في هذا الملف أثناء التشغيل، فعدّله والسيرفر متوقف فقط.
+        en: Your server's name, max players, difficulty, chat and role passwords. Change them from the Settings and Difficulty tabs and we write them into the file, at the next start if the server is running. Enshrouded writes to this file while it runs, so edit it only while the server is stopped.
+    - match: savegame
+      label:
+        ar: مابك
+        en: Your world
+      icon: globe
+      color: "#4a8fd4"
+      note:
+        ar: هنا ملف مابك world0.ksd. لا تحذفه ولا ترفع ملفات فوقه والسيرفر شغّال، وارفع مابك أو نزّله أو نفّذ له وايب من تبويب الماب.
+        en: Your world file world0.ksd lives here. Never delete it or upload over it while the server is up. Upload, download or wipe your world from the World tab instead.
+    - match: logs
+      label:
+        ar: السجلات
+        en: Logs
+      icon: box
+      color: "#7a8290"
+      note:
+        ar: سجل سيرفرك enshrouded_server.log، ومنه نقرأ الكونسول والأحداث. عند كل تشغيل نحفظ سجل التشغيل السابق باسم enshrouded_server-previous.log، فارجع إليه إذا توقف السيرفر فجأة. احذفها متى أردت.
+        en: Your server log enshrouded_server.log, which is where the console and the events are read from. At every start we keep the previous run's log as enshrouded_server-previous.log, so check it if the server stopped unexpectedly. Delete them whenever you like.
+
+guideTags:
+  - id: start
+    name:
+      ar: ابدأ من هنا
+      en: Start here
+  - id: features
+    name:
+      ar: مميزات
+      en: Features
+
+guides:
+  - id: getting-started
+    title:
+      ar: البدء بسيرفرك
+      en: Getting started
+    summary:
+      ar: شغّل سيرفر إنشراودد، وادخله مع أصحابك من قائمة السيرفرات أو من مفضلة Steam، واعرف كلمات مرور الرتب الأربع وما لا يستطيعه سيرفر إنشراودد.
+      en: Get your Enshrouded server running, join it with your friends from the server list or your Steam favorites, and learn the four role passwords and what an Enshrouded server can't do.
+    tags:
+      - start
+    surfaces:
+      - overview
+      - setup
+    bodyPath:
+      ar: guides/getting-started/ar.md
+      en: guides/getting-started/en.md
+  - id: settings
+    title:
+      ar: إعدادات السيرفر
+      en: Server settings
+    summary:
+      ar: اسم السيرفر وعدد اللاعبين والوسوم والشات والصعوبة وكلمات المرور، ومتى يُطبَّق كل إعداد، وما تنتبه له في ملف الإعدادات.
+      en: The server name, max players, tags, chat, difficulty and passwords, when each one applies, and what to watch for in the settings file.
+    tags:
+      - features
+    surfaces:
+      - panel
+      - files
+    bodyPath:
+      ar: guides/settings/ar.md
+      en: guides/settings/en.md
+  - id: roles
+    title:
+      ar: الرتب وكلمات المرور
+      en: Roles and passwords
+    summary:
+      ar: الرتب الأربع وصلاحياتها، وكيف تحدد كلمة المرور رتبة كل لاعب، وأين تضبط كلمات المرور وتقرؤها، ومتى يُطبَّق التغيير.
+      en: The four roles and their rights, how the password decides each player's role, where to set and read the passwords, and when a change applies.
+    tags:
+      - features
+    surfaces:
+      - panel
+    bodyPath:
+      ar: guides/roles/ar.md
+      en: guides/roles/en.md
+  - id: players
+    title:
+      ar: اللاعبون والطرد والحظر
+      en: Players, kick and ban
+    summary:
+      ar: من المتصل الآن، والطرد والحظر من داخل اللعبة، وإبعاد لاعب بكلمة مرور جديدة، وأوامر الكونسول.
+      en: Who's on now, kicking and banning from inside the game, keeping a player out with a new password, and the console commands.
+    tags:
+      - features
+    surfaces:
+      - panel
+      - console
+    bodyPath:
+      ar: guides/players/ar.md
+      en: guides/players/en.md
+  - id: worlds
+    title:
+      ar: الماب ونقله
+      en: Your world and moving it
+    summary:
+      ar: ملف الماب، وتنزيله، ونقل ماب من جهازك إلى سيرفرك، والوايب، ولماذا تبقى الشخصيات على أجهزة اللاعبين.
+      en: The world file, downloading it, moving a world from your PC to your server, wiping it, and why characters stay on players' PCs.
+    tags:
+      - features
+    surfaces:
+      - panel
+      - files
+    bodyPath:
+      ar: guides/worlds/ar.md
+      en: guides/worlds/en.md
+  - id: backups
+    title:
+      ar: النسخ الاحتياطية
+      en: Backups
+    summary:
+      ar: كيف يحفظ إنشراودد، وما تحويه النسخة الاحتياطية، والفرق بين النسخة النظيفة ونسخة أثناء اللعب، والاسترجاع.
+      en: How Enshrouded saves, what a backup holds, clean and mid-play backups, and restoring one.
+    tags:
+      - features
+    surfaces:
+      - backups
+      - panel
+    bodyPath:
+      ar: guides/backups/ar.md
+      en: guides/backups/en.md
+  - id: updates
+    title:
+      ar: التحديثات وتطابق الإصدار
+      en: Updates and matching versions
+    summary:
+      ar: لماذا يلزم أن يطابق إصدار السيرفر إصدار اللعبة، وكيف نحدّث سيرفرك، وما تفعله عندما تظهر لأصحابك رسالة server version too old.
+      en: Why the server must match the game version, how we update your server, and what to do when your friends see server version too old.
+    tags:
+      - start
+    surfaces:
+      - overview
+    bodyPath:
+      ar: guides/updates/ar.md
+      en: guides/updates/en.md
+  - id: performance
+    title:
+      ar: الأداء والرام
+      en: Performance and RAM
+    summary:
+      ar: الرام والمعالج والمساحة التي يحتاجها سيرفر إنشراودد، وريستارت يومي في وقت هادئ، ومتى تقلّل عدد اللاعبين.
+      en: The RAM, CPU and disk an Enshrouded server needs, a daily restart at a quiet hour, and when to lower max players.
+    tags:
+      - features
+    surfaces:
+      - overview
+    bodyPath:
+      ar: guides/performance/ar.md
+      en: guides/performance/en.md
